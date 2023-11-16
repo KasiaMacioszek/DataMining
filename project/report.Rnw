@@ -1,0 +1,68 @@
+\documentclass{article}
+\usepackage[a4paper, total={6.5in, 10.5in}]{geometry}
+
+\author{Katarzyna Macioszek, Ada Majchrzak}
+\title{Data Mining project - part I}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+In this project, we will use data mining methods to perform analysis of \textit{Spambase}
+dataset. The considered dataset was created from two collection of e-mails, 
+the first being a set of non-spam personal and professional e-mails, and the 
+second one one coming from individuals who had filed spam. The e-mails were 
+analyzed in terms of frequency of appearance of 54 selected words and characters,
+and also in terms of the number of capital letters present. 
+Those statistics were then collected into table and each record was labeled 
+as spam or non-spam. Our goal is to first extract interesting and insightful data characteristics
+by Exploratory Data Analysis procedures, and then to perform a classification task,
+distinguishing spam from non-spam. For the second part, we will compare the performance
+of several methods, namely KNN, Random Forest, \textbf{DOPISAĆ PÓŹNIEJ JAKIE KLASYFIKATORY}.
+The benefit from this kind of study could be obtaining a model effective in terms 
+of spam filtering. We know that spam e-mails are a very common problem in modern 
+world, and although every mailbox nowadays has built-in filter for that kind
+of content, non of them are completely accurate, so it is certainly a good idea
+to keep studying this topic.
+
+\section{Exploratory Data Analysis}
+
+<<packages, include=F>>=
+library(kernlab)
+library(ggplot2)
+library(summarytools)
+library(xtable)
+@
+
+The dataset consist of 4601 records, none of which contain any missing values.
+There are 57 numerical features and one categorical, \textit{type}, being a target class.
+The target class takes two values - spam and nonspam. As we can see from Figure \ref{fig1},
+the classes are quite well balanced. Around 60\% of the records fall into nonspam category,
+and about 40\% of them are spam. As for the numerical features, their summary statistics
+can be found in Table \ref{tab1}
+
+<<dataLoad, include=F>>=
+data(spam)
+@
+
+<<tgtClassPlot, echo=F, fig.cap="\\label{fig1} Target class distribution", fig.height=4, fig.pos="h">>=
+ggplot(spam, aes(x=type)) +
+    geom_bar(fill='seagreen4') +
+    ggtitle('Variable type group count') +
+    theme(
+        plot.title = element_text(size = 14),
+        axis.title = element_text(size = 10),         
+        axis.text.x = element_text(size = 10),        
+        axis.text.y = element_text(size = 10)
+        )
+@
+
+
+<<summaryStats, echo=FALSE,results='asis'>>=
+  sumStats <- descr(spam, stats = c('mean', 'sd', 'min', 'max', 'Q1', 'med', 'Q3'))
+  print(xtable(x=t(sumStats), caption='Summary statistics for numerical features', label='tab1'))
+@
+
+
+\end{document}
