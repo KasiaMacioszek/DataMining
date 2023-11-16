@@ -10,9 +10,9 @@
 \section{Introduction}
 
 In this project, we will use data mining methods to perform analysis of \textit{Spambase}
-dataset. The considered dataset was created from two collection of e-mails, 
+dataset. The considered dataset was created from two collections of e-mails, 
 the first being a set of non-spam personal and professional e-mails, and the 
-second one one coming from individuals who had filed spam. The e-mails were 
+second one coming from individuals who had filed spam. The e-mails were 
 analyzed in terms of frequency of appearance of 54 selected words and characters,
 and also in terms of the number of capital letters present. 
 Those statistics were then collected into table and each record was labeled 
@@ -40,7 +40,7 @@ There are 57 numerical features and one categorical, \textit{type}, being a targ
 The target class takes two values - spam and nonspam. As we can see from Figure \ref{fig1},
 the classes are quite well balanced. Around 60\% of the records fall into nonspam category,
 and about 40\% of them are spam. As for the numerical features, their summary statistics
-can be found in Table \ref{tab1}
+can be found in Table \ref{tab1}.
 
 <<dataLoad, include=F>>=
 data(spam)
