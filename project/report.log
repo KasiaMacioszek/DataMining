@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2020.4.5)  17 NOV 2023 20:05
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2020.4.5)  29 NOV 2023 20:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -219,20 +219,20 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 58.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 58.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 94.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 96.
 (c:/texlive/2019/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 94.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 96.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 100.
+(Font)              <7> on input line 102.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 100.
+(Font)              <5> on input line 102.
 <figure/tgtClassPlot-1.pdf, id=1, 505.89pt x 289.08pt>
 File: figure/tgtClassPlot-1.pdf Graphic file (type pdf)
 <use figure/tgtClassPlot-1.pdf>
-Package pdftex.def Info: figure/tgtClassPlot-1.pdf  used on input line 115.
+Package pdftex.def Info: figure/tgtClassPlot-1.pdf  used on input line 117.
 (pdftex.def)             Requested size: 469.75499pt x 268.43579pt.
 
 
@@ -240,27 +240,170 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 [1
 
-{c:/texlive/2019/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2 <./figure/tg
-tClassPlot-1.pdf>] [3] (./report.aux) ) 
+{c:/texlive/2019/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+<figure/georgeBox-1.pdf, id=15, 505.89pt x 722.7pt>
+File: figure/georgeBox-1.pdf Graphic file (type pdf)
+<use figure/georgeBox-1.pdf>
+Package pdftex.def Info: figure/georgeBox-1.pdf  used on input line 218.
+(pdftex.def)             Requested size: 469.75499pt x 671.08952pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<figure/num3dBox-1.pdf, id=16, 505.89pt x 722.7pt>
+File: figure/num3dBox-1.pdf Graphic file (type pdf)
+<use figure/num3dBox-1.pdf>
+Package pdftex.def Info: figure/num3dBox-1.pdf  used on input line 225.
+(pdftex.def)             Requested size: 469.75499pt x 671.08952pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<figure/charExclamationBox-1.pdf, id=17, 505.89pt x 722.7pt>
+File: figure/charExclamationBox-1.pdf Graphic file (type pdf)
+<use figure/charExclamationBox-1.pdf>
+Package pdftex.def Info: figure/charExclamationBox-1.pdf  used on input line 23
+2.
+(pdftex.def)             Requested size: 469.75499pt x 671.08952pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<figure/capitalAveBox-1.pdf, id=18, 505.89pt x 722.7pt>
+File: figure/capitalAveBox-1.pdf Graphic file (type pdf)
+<use figure/capitalAveBox-1.pdf>
+Package pdftex.def Info: figure/capitalAveBox-1.pdf  used on input line 265.
+(pdftex.def)             Requested size: 469.75499pt x 671.08952pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<figure/capitalLongBox-1.pdf, id=19, 505.89pt x 722.7pt>
+File: figure/capitalLongBox-1.pdf Graphic file (type pdf)
+<use figure/capitalLongBox-1.pdf>
+Package pdftex.def Info: figure/capitalLongBox-1.pdf  used on input line 272.
+(pdftex.def)             Requested size: 469.75499pt x 671.08952pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<figure/capitalTotalBox-1.pdf, id=20, 505.89pt x 722.7pt>
+File: figure/capitalTotalBox-1.pdf Graphic file (type pdf)
+<use figure/capitalTotalBox-1.pdf>
+Package pdftex.def Info: figure/capitalTotalBox-1.pdf  used on input line 279.
+(pdftex.def)             Requested size: 469.75499pt x 671.08952pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[2 <./figure/tgtClassPlot-1.pdf>] [3] [4 <./figure/georgeBox-1.pdf>] [5 <./figu
+re/num3dBox-1.pdf>] [6 <./figure/charExclamationBox-1.pdf>] [7 <./figure/capita
+lAveBox-1.pdf>] [8 <./figure/capitalLongBox-1.pdf>] [9 <./figure/capitalTotalBo
+x-1.pdf>]
+<figure/corrMatrix-1.pdf, id=81, 505.89pt x 722.7pt>
+File: figure/corrMatrix-1.pdf Graphic file (type pdf)
+<use figure/corrMatrix-1.pdf>
+Package pdftex.def Info: figure/corrMatrix-1.pdf  used on input line 311.
+(pdftex.def)             Requested size: 469.75499pt x 671.08952pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[10
+
+] [11 <./figure/corrMatrix-1.pdf>]
+<figure/avgErrKNN-1.pdf, id=94, 505.89pt x 289.08pt>
+File: figure/avgErrKNN-1.pdf Graphic file (type pdf)
+<use figure/avgErrKNN-1.pdf>
+Package pdftex.def Info: figure/avgErrKNN-1.pdf  used on input line 428.
+(pdftex.def)             Requested size: 469.75499pt x 268.43579pt.
+ [12
+
+ <./figure/avgErrKNN-1.pdf>]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<figure/avgErrRF-1.pdf, id=104, 505.89pt x 289.08pt>
+File: figure/avgErrRF-1.pdf Graphic file (type pdf)
+<use figure/avgErrRF-1.pdf>
+Package pdftex.def Info: figure/avgErrRF-1.pdf  used on input line 547.
+(pdftex.def)             Requested size: 469.75499pt x 268.43579pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[13]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[14 <./figure/avgErrRF-1.pdf>]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[15]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[16] [17] [18] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 2512 strings out of 492623
- 34622 string characters out of 6133291
- 134742 words of memory out of 5000000
- 6401 multiletter control sequences out of 15000+600000
- 7626 words of font info for 27 fonts, out of 8000000 for 9000
+ 2607 strings out of 492623
+ 36782 string characters out of 6133291
+ 137126 words of memory out of 5000000
+ 6484 multiletter control sequences out of 15000+600000
+ 8768 words of font info for 31 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,8n,35p,273b,246s stack positions out of 5000i,500n,10000p,200000b,80000s
-<c:/texlive/2019/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmbx12.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmmi7.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmr10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb>
-<c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><c:/texliv
-e/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2019/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on report.pdf (3 pages, 92665 bytes).
+ 41i,9n,35p,273b,248s stack positions out of 5000i,500n,10000p,200000b,80000s
+<c:/texlive/2019/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmbx10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmbx12.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti1
+0.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:
+/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><c:/texlive/2
+019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2019/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2019/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmr17.pfb><c:/texlive/2019/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmsy10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmti10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+tt10.pfb>
+Output written on report.pdf (18 pages, 473600 bytes).
 PDF statistics:
- 48 PDF objects out of 1000 (max. 8388607)
- 33 compressed objects within 1 object stream
+ 167 PDF objects out of 1000 (max. 8388607)
+ 114 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 51 words of extra memory for PDF output out of 10000 (max. 10000000)
 

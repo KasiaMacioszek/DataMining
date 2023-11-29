@@ -34,7 +34,12 @@ library(kernlab)
 library(ggplot2)
 library(summarytools)
 library(xtable)
+library(corrplot)
+library(cowplot)
+library(caret)
 @
+
+\subsection*{Dataset description}
 
 The dataset consist of 4601 records, none of which contain any missing values.
 There are 57 numerical features and one categorical, \textit{type}, being a target class.
@@ -61,9 +66,9 @@ Regarding Capital features, here the range of values is significantly broader. T
 three of those is 1, while the maximum is 1102.5 for \textit{capitalAve}, 9989.0 for \textit{capitalLong},
 and 15841.0 for \textit{capitalTotal}. As expected, also the standard deviations for this set
 of features are much higher compared to the previous one. Those differences need to be
-kept in mind and accounted for during the classfication tasks.
+kept in mind and accounted for during the classfication tasks by appropriate data transformations.
 
-<<dataLoad, include=F>>=
+<<dataLoad, include=FALSE>>=
 data(spam)
 @
 
@@ -84,6 +89,786 @@ ggplot(spam, aes(x=type)) +
   sumStats <- descr(spam, stats = c('mean', 'sd', 'min', 'max', 'Q1', 'med', 'Q3'))
   print(xtable(x=t(sumStats), caption='Summary statistics for numerical features', label='tab1'))
 @
+
+\subsection*{Potential outliers}
+
+As we already mentioned, the distribution observed for the Frequency features is quite peculiar,
+with all three quartiles equal to zero in most cases. For that reason, finding the
+potential outliers migth be problematic -- for sure the classical approach with $1.5IQR$
+would not be a good idea here, as it could missclassify most of the nonzero observations 
+as outliers. Moreover, given the characteristics of our data, even the unusually high
+frequencies don't necessarily need to be treated as outliers causing biased results
+in data analysis or classification task. On the contrary, we expect that they can be 
+quite informative when trying to distinguish between spam and nonspam e-mails, as 
+some of the words or characters will not be used much in private messages, but repeated
+frequently in spam, and vice versa. Considering all that, we will not try to identify and 
+remove the potential outliers, but we will use boxplots to see how various transformations
+will influence data distribution and the number of detected potential oultiers. Of course, 
+as we have 54 Frequency features, we will not show the boxplots for all of them.
+Instead, we picked three variables with the widest range of values - \textit{george},
+\textit{num3d} and \textit{charExclamation}. As for the data transformations, 
+we will compare zscore standardization and $\log(x+0.1)$ transformation.
+
+<<boxFunc, include=FALSE>>=
+boxplots <- function(var, nonzero=TRUE) {
+
+    box_all <- ggplot(data=spam, aes(x=type, y=!!as.name(var))) + 
+                geom_boxplot(fill='seagreen4', outlier.size=0.5) +
+                ggtitle(paste(var, '- all records, no transformation')) +
+                theme(
+                plot.title = element_text(size = 8),
+                axis.title = element_text(size = 7),         
+                axis.text.x = element_text(size = 7),        
+                axis.text.y = element_text(size = 7))
+
+    box_log <- ggplot(data=spam, aes(x=type, y=log(!!as.name(var)+0.1))) + 
+                geom_boxplot(fill='seagreen4', outlier.size=0.5) +
+                ggtitle(paste(var, '- all records, log(x+0.1) transformation')) +
+                theme(
+                plot.title = element_text(size = 8),
+                axis.title = element_text(size = 7),         
+                axis.text.x = element_text(size = 7),        
+                axis.text.y = element_text(size = 7))
+
+    box_zscore <- ggplot(data=spam, aes(x=type, y=scale(!!as.name(var)))) + 
+                geom_boxplot(fill='seagreen4', outlier.size=0.5) +
+                ggtitle(paste(var, '- all records, zscore transformation')) +
+                theme(
+                plot.title = element_text(size = 8),
+                axis.title = element_text(size = 7),         
+                axis.text.x = element_text(size = 7),        
+                axis.text.y = element_text(size = 7))
+
+    if (nonzero==TRUE) {
+        box_nonzero <- ggplot(data=spam[spam[[var]] != 0, ], aes(x=type, y=!!as.name(var))) + 
+                    geom_boxplot(fill='seagreen4', outlier.size=0.5) +
+                    ggtitle(paste(var, '- nonzero records, no transformation')) +
+                    theme(
+                    plot.title = element_text(size = 8),
+                    axis.title = element_text(size = 7),         
+                    axis.text.x = element_text(size = 7),        
+                    axis.text.y = element_text(size = 7))
+
+        box_nonzero_log <- ggplot(data=spam[spam[[var]] != 0, ], aes(x=type, y=log(!!as.name(var)+0.1))) + 
+                    geom_boxplot(fill='seagreen4', outlier.size=0.5) +
+                    ggtitle(paste(var, '- nonzero records, log(x+0.1) transformation')) +
+                    theme(
+                    plot.title = element_text(size = 8),
+                    axis.title = element_text(size = 7),         
+                    axis.text.x = element_text(size = 7),        
+                    axis.text.y = element_text(size = 7))
+
+        box_nonzero_zscore <- ggplot(data=spam[spam[[var]] != 0, ], aes(x=type, y=scale(!!as.name(var)))) + 
+                    geom_boxplot(fill='seagreen4', outlier.size=0.5) +
+                    ggtitle(paste(var, '- nonzero records, zscore transformation')) +
+                    theme(
+                    plot.title = element_text(size = 8),
+                    axis.title = element_text(size = 7),         
+                    axis.text.x = element_text(size = 7),        
+                    axis.text.y = element_text(size = 7))
+                    
+        plot_grid(box_all, box_log, box_zscore, box_nonzero, box_nonzero_log, box_nonzero_zscore, ncol = 2)
+    }
+
+    else {
+        plot_grid(box_all, box_log, box_zscore, ncol = 1)
+    }
+}
+@
+
+<<georgeBox, echo=F, fig.cap="\\label{fig2} Boxplots for george variable", fig.height=10, fig.pos="h">>=
+  boxplots('george')
+@
+
+<<num3dBox, echo=F, fig.cap="\\label{fig3} Boxplots for num3d variable", fig.height=10, fig.pos="h">>=
+  boxplots('num3d')
+@
+
+<<charExclamationBox, echo=F, fig.cap="\\label{fig4} Boxplots for charExclamation variable", fig.height=10, fig.pos="h">>=
+  boxplots('charExclamation')
+@
+
+Figure \ref{fig2} shows the boxplots for \textit{george} variable. We can see that for the untransformed
+data there are multiple outliers in the \textit{nonspam} class, few outliers for \textit{spam}, and
+the distribution for both classes is strongly concentrated around zero. For zscore it looks almost
+identical, but in the case of log transformation, we can see that the distribution spreads 
+out a little -- at least we can distinguish quartiles for the \textit{nonspam} class, and the number
+of detected outliers decreases. The changes are even more visible when we consider only nonzero records.
+Here, again the untransformed data and zscore are very similar, and the log transformation in this case
+displays wider boxes with only two outliers visible for the \textit{spam} class.
+A similar situation can be observed for the \textit{num3d} (Figure \ref{fig3}) variable. Although the differences
+between the raw and transformed data are not that clear in case of all records, 
+it becomes very obvious when we just consider the nonzero values. Zscore and untransformed data
+are again very similar, while for the log transformation we have very wide boxes and no 
+outliers. Same observations can be drawn from Figure \ref{fig4}, showing the boxplots
+for \textit{charExclamation} variable, although this time, we were not able to achieve a distribution without any outliers,
+even in the case of log transformation with nonzero records only. Still, this method
+clearly outperformed the zscore, resulting in much wider boxes and longer whiskers,
+with less values detected as outliers.
+
+As for the Capital features, their distributions also characterize with having
+very low $3^{rd}$ quartile compared to maximum observed value. However, this time 
+the $1^{st}$, $2^{nd}$ and $3^{rd}$ quartile differ from one another, and the
+minimum value for all three variables is 1, so we don't need to consider the nonzero
+case while looking for potential outliers. Still, the distributions are very much concentrated
+around some relatively small value, with numerous outliers spread out above that value,
+so we'll consider exactly the same transformations for this set of features.
+
+<<capitalAveBox, echo=F, fig.cap="\\label{fig5} Boxplots for capitalAve variable", fig.height=10, fig.pos="h">>=
+  boxplots('capitalAve', nonzero = FALSE)
+@
+
+<<capitalLongBox, echo=F, fig.cap="\\label{fig6} Boxplots for capitalLong variable", fig.height=10, fig.pos="h">>=
+  boxplots('capitalLong', nonzero = FALSE)
+@
+
+<<capitalTotalBox, echo=F, fig.cap="\\label{fig7} Boxplots for capitalTotal variable", fig.height=10, fig.pos="h">>=
+  boxplots('capitalTotal', nonzero = FALSE)
+@
+
+Let us first take a look at the \textit{capitalAve} variable boxplots, shown on Figure \ref{fig5}.
+As in the previous cases, the log transformation stands out with wide boxes, but this time the number 
+of outliers does not seem to be significantly decreased. For the \textit{capitalLong}
+(Figure \ref{fig6}) and \textit{capitalTotal} (Figure \ref{fig7}), the results of 
+log transformation are even better, reducing the number of potential outliers compared
+to zscore and untransformed data.
+
+To sum up, as the $log(x+0.1)$ data transformation seems to work better in most cases 
+than the zscore standardization in case of reshaping the feature distribution, 
+we expect that the classifiers will perform better on such transformed data. 
+However, we are going to validate it later in this report by comparing the performance
+of classification models using both methods.
+
+\clearpage
+
+\subsection*{Feature correlation}
+
+The spambase data set has as much as $57$ features, so elimination of some of those may 
+have a significant impact on efficiency of classification algorithms. 
+The most common approach here is to look at feature correlations. This way we can 
+remove some variables that are highly correlated with others, as they do not provide 
+much more information in the classification problem. It is also faster and more 
+convenient to use only one of such variables. First let us take a look at correlation matrix, 
+that was presented on Figure \ref{fig8} as it can show some interesting details about the data set.
+
+<<corrMatrix, echo=F, fig.cap="\\label{fig8} Correlation matrix of spam dataset", fig.height=10, fig.pos="h">>=
+  spam_binary <- spam[, -58]
+  spam_binary$spam <- ifelse(spam$type=='spam', 1, 0)
+  corrplot(cor(spam_binary), method='square', tl.col='black', tl.cex=0.5)
+@
+
+From the correlation matrix we see that there are a few features highly correlated 
+with one another. However generally the explanatory variables don't seem to be highly correlated, 
+so we expect that not many variables can be skipped in the later analysis. 
+To check that further we use function $\texttt{findCorrelation}$ with cutoff equal to $0.8$.
+<<findCorr, echo=FALSE>>=
+  correlatedFeatures.id <- findCorrelation(cor(spam[, 1:57]), names=TRUE, cutoff=0.8, verbose=TRUE)
+@
+From the output we can see that with adopted cutoff we can eliminate features 'num415' 
+and 'num857', so now we are left with $55$ variables. This is not the only advantage 
+that correlation matrix can give us, as we can also find variables that have the highest 
+correlation with e-mail type. However earlier presented correlation matrix is not easy to read. 
+Let us take out the features that have highest positive or negative correlation with type.
+
+<<transformedData, include=FALSE>>=
+  spam<- spam[, -c(32, 34)]
+  numeric_columns <- spam[, 1:55]
+  log_data <- as.data.frame(log(numeric_columns+0.1))
+  spam_log <- cbind(log_data, spam[, 56, drop = FALSE])
+  scaled_data <- as.data.frame(scale(numeric_columns))
+  spam_scaled <- cbind(scaled_data, spam[, 56, drop = FALSE])
+@
+
+<<corrSpam, echo=FALSE, results='asis'>>=
+  spam_binary <- spam[, -56]
+  spam_binary$spam <- ifelse(spam$type == "spam", 1, 0)
+  correlation <- cor(spam_binary)
+  correlation_with_spam <- correlation[, ncol(correlation)]
+  correlation_with_spam <- abs(correlation_with_spam)
+  correlation_with_spam <- sort(correlation_with_spam, decreasing = TRUE)[2:11]
+  most_correlated <- data.frame(correlation_with_spam)
+  print(xtable(x=most_correlated, caption='Features most correlated with target class variable', label='tab2'))
+@
+
+Results presented above are also visible on the matrix. It's important to point 
+out that those features may have a great impact on classification of e-mails,
+which we will try to investigate later on.
+	
+\subsection*{Average frequency}
+	
+Other important data feature is the average value. In the classification problem 
+the average value among all variables is not as crucial as the difference in average 
+word or character frequency between two investigated types. Let us take out variables, 
+that demonstrate the highest difference in average value.
+
+<<avgFreq, echo=FALSE, results='asis'>>=
+  
+  spam_data <- spam[spam$type == "spam", ]
+  nonspam_data <- spam[spam$type == "nonspam", ]
+  
+  freq_spam <- colMeans(spam_data[, 1:52])
+  freq_nonspam <- colMeans(nonspam_data[, 1:52])
+  
+  freq_diff <- abs(freq_spam - freq_nonspam)
+  sorted_freqs <- sort(freq_diff, decreasing = TRUE)[1:10]
+  
+  freq_spam_df <- t(as.data.frame(freq_spam))
+  freq_nonspam_df <- t(as.data.frame(freq_nonspam))
+  
+  colnames <- names(sorted_freqs)
+  freq_spam_highest <- freq_spam_df[, c(colnames[1])]
+  
+  freqs_df <- data.frame(c('spam', 'nonspam'))
+  colnames(freqs_df) <- c('type')
+  for (i in 1:length(sorted_freqs)) {
+    column <- c(freq_spam_df[, c(colnames[i])], freq_nonspam_df[, c(colnames[i])])
+  
+    freqs_df[colnames[i]] <- column
+  }
+  
+  print(xtable(x=freqs_df, caption='Average frequency of variables across e-mail types', label='tab3'))
+
+@
+
+Here also we expect that, as for features highly correlated with \textit{type}, those also will have crucial impact on spam classification.
+
+\clearpage
+
+
+\section{Classification}
+
+For the classification task, we will consider the complete dataset and several 
+subsets of features and assess the accuracy for all of them. First, we want to check
+how well Frequency features and Capital features perform when used separately. 
+Then, we will examine if feature reduction to the features highly correlated with \textit{type}
+or those with highest difference in average frequency between classes will lead 
+to satisfactory results. Apart from comparing different feature subsets, we will also
+inspect how the zscore scaling and $log(x+0.1)$ transformation will affect classification
+outcome. Additionally, for the models that have the hyperparameters (KNN, Random Forest), we will tune them
+using the 5-fold cross validation algorithm.
+
+<<trainIndices, include=FALSE>>=
+  train_indices <- as.matrix(read.csv('ti.csv'))
+@
+
+
+\subsection*{KNN}
+
+Before approaching classification task with KNN, first we wanted to compute the average classification error
+for two types of data transformations, and for $k \in \{1, 2, 3, \dots, 10\}$.
+To do that, we performed 100 independent runs of train-test data split, training, prediction
+and classification error calculation for each value of $k$ and each transformed dataset.
+The results are displayed on Figure \ref{fig9}. We can see that the shape of both lines is similar,
+with maximum at $k=2$, but the minimum for zscore is observed at $k=1$, and for $log(x+0.1)$
+at $k=5$, which means that, on average, $k=2$ always performs the worst, but the best performing
+value of $k$ depends on the data variant. Moreover, the error for log transformation is much smaller 
+than for the zscore for all values of $k$, which suggests that we should rather use the 
+log-transformed data for our classification task. Now we can check how KNN will perform with different sets of features,
+each time using 5-fold cross validation algorithm to tune the optimal value of $k$.
+
+<<avgErrKNN, echo=F, fig.cap="\\label{fig9} Average classification error for KNN", fig.height=4, fig.pos="h">>=
+knn_errs <- read.csv('knn_errs.csv')
+
+ggplot(knn_errs, aes(x = x, y = y, color = group)) +
+  geom_line(linewidth=0.7)  + 
+  labs(x = 'k', y = 'avg error', title = 'Average classification error for KNN') +
+  scale_x_continuous(breaks=seq(1, 10, by = 1)) +
+  scale_color_manual(values=c('seagreen4', 'darkolivegreen3')) +
+  theme(
+      plot.title = element_text(size = 14),
+      axis.title = element_text(size = 12),         
+      axis.text.x = element_text(size = 10),        
+      axis.text.y = element_text(size = 10),
+      legend.text = element_text(size = 10),        
+      legend.title = element_text(size = 12),
+      legend.position = 'top')
+@
+
+\subsubsection*{All features}
+
+Table \ref{KNNcm1} shows the confusion matrix for all features KNN classification.
+In this case, the algorithm picked $k=3$ as the optimal hyperparameter.
+We see that most observations were classified correctly, resulting in 0.9391 accuracy,
+0.9472 sensitivity and 0.9265 specificity, so the model performed slightly worse for 
+the \textit{nonspam} class (we treat \textit{spam} as positive and \textit{nonspam} as negative).
+Of course, the reason for that might be the slight class disproportion, as the model
+had less observations of \textit{nonspam} to learn from.  
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 664 & 33 \\
+        spam & 37 & 416 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, all features}
+    \label{KNNcm1}
+\end{table}
+
+\subsubsection*{Frequency features}
+
+For Frequency features, we observe a worse performance, with 0.9278 accuracy,
+0.9288 sensitivity and 0.9263 specificity. Again, the results are slightly better 
+for the \textit{spam} class. Here, the optimal $k$ is 5.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 665 & 32 \\
+        spam & 51 & 402 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, Frequency features}
+    \label{KNNcm2}
+\end{table}
+
+\subsubsection*{Capital features}
+
+In the case of Capital features, the optimal value of $k$ is 1, and the KNN model performance goes down significantly
+compared to the previous two sets of features. The observed accuracy is only 0.8009,
+while the sensitivity is 0.8391, definitely outperforming the specificity
+which is just 0.7435. We observe similar trend as in two cases described above, but 
+this time much more obvious.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 579 & 118 \\
+        spam & 111 & 342 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, Capital features}
+    \label{KNNcm3}
+\end{table}
+
+\subsubsection*{Features highly correlated with \textit{type}}
+
+Although it would seem that choosing the features highly correlated with target class variable
+would lead to very good classification results, this is not the case for our data.
+The confusion matrix looks very similar to that shown for the Capital features, 
+and what follows, also the statistics are very close. This time we observe accuracy of
+0.8052, sensitivity 0.8355 and specificity 0.7573. Optimal value of $k$ is 1.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 589 & 108 \\
+        spam & 116 & 337 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, Features highly correlated with type}
+    \label{KNNcm4}
+\end{table}
+
+\subsubsection*{Features with highest average difference in frequency between types}
+
+The last set of features shows improvement over the previous two. Here, the accuracy is 0.8904,
+sensitivity 0.9050 and specificity 0.8674. It is definitely not as good as in the case 
+where we included all features or those related to frequency, but the difference is
+not as significant as for the Capital features or the features highly correlated with \textit{type}.
+The trend of better performance for the \textit{nonspam} class is preserved, and the 5-fold CV algorithm picked $k=8$.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 638 & 59 \\
+        spam & 67 & 386 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, Features with highest average difference in frequency between types}
+    \label{KNNcm5}
+\end{table}
+
+\subsection*{Random Forest}
+
+In case of Random Forest, we will follow the same procedure as for KNN -- first, 
+we are going to look at the average classification error plot for both transformed
+datasets, this time with \textit{mtry} parameter (number of features considered in each tree) on X-axis. 
+The plot is shown on Figure \ref{fig10}. This time it's not so easy to tell which data transformation
+performed better. The lines intersect several times and none of them is clearly above the other.
+However, the $\log(x+0.1)$ transformation resulted in smaller error around the
+optimal value of \textit{mtry} ($\lfloor p \rfloor = 7$, $p$ -- number of features).
+For that reason, and to keep consistent with the classifiers discussed earlier, 
+we will use the log-transformed data for the classification task with Random Forest.
+
+<<avgErrRF, echo=F, fig.cap="\\label{fig10} Average classification error for Random Forest", fig.height=4, fig.pos="h">>=
+rf_errs <- read.csv('rf_errs.csv')
+
+ggplot(rf_errs, aes(x = x, y = y, color = group)) +
+  geom_line(linewidth=0.7)  + 
+  labs(x = 'mtry', y = 'avg error', title = 'Average classification error for Random Forest') +
+  scale_x_continuous(breaks=seq(1, 55, by=5)) +
+  scale_color_manual(values=c('seagreen4', 'darkolivegreen3')) +
+  theme(
+      plot.title = element_text(size = 14),
+      axis.title = element_text(size = 12),         
+      axis.text.x = element_text(size = 10),        
+      axis.text.y = element_text(size = 10),
+      legend.text = element_text(size = 10),        
+      legend.title = element_text(size = 12),
+      legend.position = 'top')
+@
+
+\subsubsection*{All features}
+
+In case of all features Random Forest classification, the 5-fold CV algorithm picked 
+11 as the optimal value of \textit{mtry}. The accuracy is 0.9513, which exceeds that 
+of a KNN model, but not significantly (approximately 2\% difference).
+The improvement is visible also with sensitivity (0.9520) and specificity (0.9501).
+Same as KNN, the model performed better for the \textit{nonspam} class.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 675 & 22 \\
+        spam & 34 & 419 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, all features}
+    \label{RFcm1}
+\end{table}
+
+\subsubsection*{Frequency features}
+
+After reducing the dataset to Frequency features only, we observe a very small decrease
+in accuracy (0.9504). What's interesting, the sensitivity has improved slightly,
+reaching the value of 0.9533, while the specificity is worse than for all features example,
+being 0.9459. The optimal value of \textit{mtry} is once again 11.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 673 & 24 \\
+        spam & 33 & 420 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, Frequency features}
+    \label{RFcm2}
+\end{table}
+
+\subsubsection*{Capital features}
+
+For the Capital features, the optimal value of \textit{mtry} turned out to be 1.
+We observe a significant decrease of the model performance in this case. The accuracy
+is 0.8243, the sensitivity is 0.8377 and the specificity is 0.8010. Those results 
+are better than for the KNN run on the same set of features, but for sure we would 
+not call them satisfying.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 614 & 83 \\
+        spam & 119 & 334 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, Capital features}
+    \label{RFcm3}
+\end{table}
+
+\subsubsection*{Features highly correlated with \textit{type}}
+
+As opposed to KNN, in case of Random Forest we don't observe a significant decrease
+of model performance after selecting the features highly correlated with \textit{type}.
+The accuracy here is 0.9287, the sensitivity is 0.9349, and the specificity is 0.9187.
+Those results are slightly worse than for all features or Frequency features, but
+still quite good. The optimal value of \textit{mtry} is 3 this time.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 661 & 36 \\
+        spam & 46 & 407 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, Features highly correlated with type}
+    \label{RFcm4}
+\end{table}
+
+\subsubsection*{Features with highest average difference in frequency between types}
+
+For the last set of features, the 5-fold CV algorithm picked 4 as the optimal
+value of \textit{mtry}. The model performance is slightly worse than in case of
+the previous set, but definitely better than for the Capital features,
+giving accuracy of 0.9139. What's worth noticing, the trend favoring the \textit{nonspam}
+class that we observed for all other cases, is reversed here. The sensitivity 
+is 0.9096, while the specificity equals 0.9214.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 664 & 33 \\
+        spam & 66 & 387 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, Features with highest average difference in frequency between types}
+    \label{RFcm5}
+\end{table}
+
+\subsection*{Discriminant analysis}
+	
+\subsection*{All features}
+	
+Another useful classification algorithm is discriminant analysis. In this section 
+we will use linear and quadratic discriminant analysis to determine e-mail type on 
+data transformed as earlier, so we compare scaled data and data transformed with logarithm. 
+At first let us use these methods on the whole data set and examine the accuracy. 
+To do it we use the confusion matrix, first for scaled data we have Table 
+\ref{tab:confusion_matrix_lda1} and Table \ref{tab:confusion_matrix_qda1}.
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 661 & 36 \\
+			spam & 90 & 363 \\
+		\end{tabular}
+		\caption{Confusion Matrix - LDA, all features}
+		\label{tab:confusion_matrix_lda1}
+	\end{table}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 539 & 158 \\
+			spam & 18 & 435 \\
+		\end{tabular}
+		\caption{Confusion Matrix - QDA, all features}
+		\label{tab:confusion_matrix_qda1}
+	\end{table}
+
+The accuracy for described methods is quite satisfying, for LDA it's $0.8904$ 
+and for QDA - $0.847$. So in this case linear method works significantly better. 
+There's also a disproportion in confusion matrices for those methods. For LDA there 
+are more spam messages predicted as nonspam. Opposite situation occurs for QDA, which 
+works in favor of spam e-mails. Those features are nicely represented with sensitivity 
+and specificity, that for LDA are respectively $0.9098$, $0.8802$ and for QDA: $0.7336$, $0.9677$. 
+
+We perform the same algorithms on the data with logarithmic transformation and 
+obtain Tables \ref{tab:confusion_matrix_lda1_log} and \ref{tab:confusion_matrix_qda1_log}.
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 675 & 22 \\
+			spam & 53 & 400 \\
+		\end{tabular}
+		\caption{Confusion Matrix - LDA, all features}
+		\label{tab:confusion_matrix_lda1_log}
+	\end{table}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 558 & 139 \\
+			spam & 25 & 428 \\
+		\end{tabular}
+		\caption{Confusion Matrix - QDA, all features}
+		\label{tab:confusion_matrix_qda1_log}
+	\end{table}
+	
+We see that this transformation helped our algorithm to obtain better accuracy: 
+$0.9348$ for LDA and $0.8574$ for QDA. From that we conclude that other feature 
+subsets will be tested for data after logarithmic transformation.
+
+In the next part we try to build predictions using only some subsets of features. 
+We start with using either only variables representing frequencies and those describing capital letters statistics.
+
+\subsection*{Frequency features}
+
+We again provide the confusion matrices that describes the classification methods: 
+Table \ref{tab:confusion_matrix_lda2} add Table \ref{tab:confusion_matrix_qda2}.
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 670 & 27 \\
+			spam & 56 & 397 \\
+		\end{tabular}
+		\caption{Confusion Matrix - LDA, frequency features}
+		\label{tab:confusion_matrix_lda2}
+	\end{table}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 552 & 145 \\
+			spam & 24 & 429 \\
+		\end{tabular}
+		\caption{Confusion Matrix - QDA, frequency features}
+		\label{tab:confusion_matrix_qda2}
+	\end{table}
+	
+Above results exhibit accuracy $0.9278$ for LDA and $0.853$ for QDA. We also 
+observe similar disproportion in characteristics as for the previous case with 
+$0.9363$ sensitivity and $0.9229$ specificity for LDA and respectively $0.7474$ 
+and $0.9583$ for QDA. As we see elimination of features describing capital letters 
+didn't have an enormous impact on discriminant analysis results.
+
+\subsection*{Capital features}
+
+This time we take into account only three features containing information about capital 
+letters and get Tables \ref{tab:confusion_matrix_lda3} and \ref{tab:confusion_matrix_qda3}.
+
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 595 & 102 \\
+			spam & 208 & 245 \\
+		\end{tabular}
+		\caption{Confusion Matrix - LDA, capital features}
+		\label{tab:confusion_matrix_lda3}
+	\end{table}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 619 & 78 \\
+			spam & 247 & 206 \\
+		\end{tabular}
+		\caption{Confusion Matrix - QDA, capital features}
+		\label{tab:confusion_matrix_qda3}
+	\end{table}
+	 
+Here we obtain much worse accuracy: $0.7304$ for LDA and $0.7148$ - QDA. What's 
+interesting is that this time the disproportion between wrong classification of 
+different discriminant analysis algorithms is not that high and both methods are 
+more likely to incorrectly classify spam as nonspam. This results in sensitivity 
+$0.7061$ and specificity $0.7410$ for LDA and $0.7254$, $0.7148$ respectively for QDA.
+
+\subsection*{Features highly correlated with type}
+	 
+LDA and QDA results are presented in Table \ref{tab:confusion_matrix_lda4} 
+and Table \ref{tab:confusion_matrix_qda4}.
+	 
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 666 & 31 \\
+			spam & 91 & 362 \\
+		\end{tabular}
+		\caption{Confusion Matrix - LDA, features correlated with type}
+		\label{tab:confusion_matrix_lda4}
+	\end{table}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \textbf{Reference} & \\
+			\textbf{Prediction} & nonspam & spam \\
+			nonspam & 650 & 47 \\
+			spam & 91 & 362 \\
+		\end{tabular}
+		\caption{Confusion Matrix - QDA, features correlated with type}
+		\label{tab:confusion_matrix_qda4}
+	\end{table}
+	
+Despite having much less explanatory variables than when taking all frequency 
+features we obtain similar accuracy: $0.8939$ - LDA and $0.88$ - QDA. It's also 
+important to note that QDA accuracy is better in this case than for any other 
+feature subset tested before. This variable selection also omits the disproportions 
+between two analyzed discriminant analysis methods. Such property results in similar 
+statistics for both of them. Namely $0.9211$ sensitivity and $0.8798$ specificity 
+for LDA,  $0.8851$ and $0.8772$ respectively for QDA.
+	 
+	 \subsection*{features with highest average difference in frequency between types}
+	 
+Last feature selection that we test is for variables exhibiting highest difference in 
+average frequency between types. Confusion matrices are shown in Table 
+\ref{tab:confusion_matrix_lda5} ad Table \ref{tab:confusion_matrix_qda5}.
+	 
+	 \begin{table}[h]
+	 	\centering
+	 	\begin{tabular}{lcc}
+	 		& \textbf{Reference} & \\
+	 		\textbf{Prediction} & nonspam & spam \\
+	 		nonspam & 644 & 53 \\
+	 		spam & 75 & 378 \\
+	 	\end{tabular}
+	 	\caption{Confusion Matrix - LDA, features with highest average difference in}
+	 	\label{tab:confusion_matrix_lda5}
+	 \end{table}
+	 
+	 \begin{table}[h]
+	 	\centering
+	 	\begin{tabular}{lcc}
+	 		& \textbf{Reference} & \\
+	 		\textbf{Prediction} & nonspam & spam \\
+	 		nonspam & 478 & 219 \\
+	 		spam & 19 & 434 \\
+	 	\end{tabular}
+	 	\caption{Confusion Matrix - QDA, features with highest average difference in}
+	 	\label{tab:confusion_matrix_qda5}
+	 \end{table}
+	 
+In this case accuracy of LDA is still comparable to other feature subsets, namely 
+$0.8887$, however for QDA we get $0.793$. It means that this feature subset didn't 
+have much impact on linear algorithm, but for quadratic one it displays much worse accuracy. 
+Also for QDA the disproportion between sensitivity and specificity is significant: 
+$0.6646$ and $0.9618$ respectively. For LDA the disproportion is almost invisible: 
+$0.877$ - sensitivity and $0.8957$ - specificity.
+
+\section{Conclusions}
+
+The analysis focused on spam e-mail classification, covering Exploratory Data Analysis, 
+feature selection, and the evaluation of classification algorithms.
+Notable findings include the impact of various data transformations and the 
+significance of choosing different feature subsets for classification models.
+All the algorithms were quite responsive to variable selection. On general, 
+the worst performing subset was Capital features, while the best performance was
+achieved by using all explanatory variables and Frequency features.
+What's interesting, reducing the number of columns from $57$ even to $10$, usually
+didn't result in a significant drop in accuracy. 
+
+When it comes to algorithmic performance, KNN's sensitivity to data transformation 
+was evident, with log transformation consistently outperforming z-score scaling for all values of $k$. 
+On the contrary, for the Random Forest the difference between the two data transformations
+was not that clear, however the log-transformation was chosen as the better one as it
+displayed smaller classification error for the optimal value of \textit{mtry} parameter.
+Random Forest's performance persistently exceeded that of KNN, LDA and QDA, achieving higher accuracy, 
+sensitivity, and specificity for all feature subsets.
+
+Discriminant analysis, contrary to KNN and Random Forest, exhibit high disproportions 
+between specificity and sensitivity. For LDA, better sensitivity is observed in 
+most cases, while for QDA the specificity was usually higher, especially in the 
+case of all features. Again, the comparison of scaled and log-transformed data 
+highlighted the effectiveness of log transformation in enhancing classification accuracy.
+Additionally, the QDA falls behind all other considered algorithms.
+
+Above conclusions highlight the importance of strategic feature selection and data 
+transformation for optimal classification results. For the future research, one
+could consider the deep learning approach for spam classification, such as various
+types of neural networks. On top of that, one could use the cost matrix to deploy
+the cost-sensitive learning approach. Of course, the challenge here could be 
+determining which e-mail type misclassification should be assigned with higher cost.
+Additionally, the cluster analysis could be used to separate the data, which
+will be done in the next part of the project.
 
 
 \end{document}
