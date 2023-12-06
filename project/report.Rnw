@@ -345,7 +345,7 @@ or those with highest difference in average frequency between classes will lead
 to satisfactory results. Apart from comparing different feature subsets, we will also
 inspect how the zscore scaling and $log(x+0.1)$ transformation will affect classification
 outcome. Additionally, for the models that have the hyperparameters (KNN, Random Forest), we will tune them
-using the 5-fold cross validation algorithm.
+using the 5-fold cross validation algorithm. To improve readability, the confusion matrices were moved to section \ref{sec:appendix}
 
 <<trainIndices, include=FALSE>>=
   train_indices <- as.matrix(read.csv('ti.csv'))
@@ -392,37 +392,13 @@ We see that most observations were classified correctly, resulting in 0.9391 acc
 0.9472 sensitivity and 0.9265 specificity, so the model performed slightly worse for 
 the \textit{nonspam} class (we treat \textit{spam} as positive and \textit{nonspam} as negative).
 Of course, the reason for that might be the slight class disproportion, as the model
-had less observations of \textit{nonspam} to learn from.  
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 664 & 33 \\
-        spam & 37 & 416 \\
-    \end{tabular}
-    \caption{Confusion matrix - KNN, all features}
-    \label{KNNcm1}
-\end{table}
+had less observations of \textit{nonspam} to learn from.
 
 \subsubsection*{Frequency features}
 
-For Frequency features, we observe a worse performance, with 0.9278 accuracy,
+For Frequency features (Table \ref{KNNcm2}), we observe a worse performance, with 0.9278 accuracy,
 0.9288 sensitivity and 0.9263 specificity. Again, the results are slightly better 
 for the \textit{spam} class. Here, the optimal $k$ is 5.
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 665 & 32 \\
-        spam & 51 & 402 \\
-    \end{tabular}
-    \caption{Confusion matrix - KNN, Frequency features}
-    \label{KNNcm2}
-\end{table}
 
 \subsubsection*{Capital features}
 
@@ -430,59 +406,25 @@ In the case of Capital features, the optimal value of $k$ is 1, and the KNN mode
 compared to the previous two sets of features. The observed accuracy is only 0.8009,
 while the sensitivity is 0.8391, definitely outperforming the specificity
 which is just 0.7435. We observe similar trend as in two cases described above, but 
-this time much more obvious.
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 579 & 118 \\
-        spam & 111 & 342 \\
-    \end{tabular}
-    \caption{Confusion matrix - KNN, Capital features}
-    \label{KNNcm3}
-\end{table}
+this time much more obvious (see Table \ref{KNNcm3}).
 
 \subsubsection*{Features highly correlated with \textit{type}}
 
 Although it would seem that choosing the features highly correlated with target class variable
 would lead to very good classification results, this is not the case for our data.
-The confusion matrix looks very similar to that shown for the Capital features, 
+The confusion matrix, shown in Table \ref{KNNcm4}, looks very similar to that shown for the Capital features, 
 and what follows, also the statistics are very close. This time we observe accuracy of
 0.8052, sensitivity 0.8355 and specificity 0.7573. Optimal value of $k$ is 1.
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 589 & 108 \\
-        spam & 116 & 337 \\
-    \end{tabular}
-    \caption{Confusion matrix - KNN, Features highly correlated with type}
-    \label{KNNcm4}
-\end{table}
 
 \subsubsection*{Features with highest average difference in frequency between types}
 
 The last set of features shows improvement over the previous two. Here, the accuracy is 0.8904,
-sensitivity 0.9050 and specificity 0.8674. It is definitely not as good as in the case 
+sensitivity 0.9050 and specificity 0.8674 (see Table \ref{KNNcm5}). It is definitely not as good as in the case 
 where we included all features or those related to frequency, but the difference is
 not as significant as for the Capital features or the features highly correlated with \textit{type}.
 The trend of better performance for the \textit{nonspam} class is preserved, and the 5-fold CV algorithm picked $k=8$.
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 638 & 59 \\
-        spam & 67 & 386 \\
-    \end{tabular}
-    \caption{Confusion matrix - KNN, Features with highest average difference in frequency between types}
-    \label{KNNcm5}
-\end{table}
 
 \subsection*{Random Forest}
 
@@ -521,98 +463,42 @@ In case of all features Random Forest classification, the 5-fold CV algorithm pi
 of a KNN model, but not significantly (approximately 2\% difference).
 The improvement is visible also with sensitivity (0.9520) and specificity (0.9501).
 Same as KNN, the model performed better for the \textit{nonspam} class.
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 675 & 22 \\
-        spam & 34 & 419 \\
-    \end{tabular}
-    \caption{Confusion matrix - Random Forest, all features}
-    \label{RFcm1}
-\end{table}
+The confusion matrix can be found in Table \ref{RFcm1}.
 
 \subsubsection*{Frequency features}
 
 After reducing the dataset to Frequency features only, we observe a very small decrease
 in accuracy (0.9504). What's interesting, the sensitivity has improved slightly,
 reaching the value of 0.9533, while the specificity is worse than for all features example,
-being 0.9459. The optimal value of \textit{mtry} is once again 11.
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 673 & 24 \\
-        spam & 33 & 420 \\
-    \end{tabular}
-    \caption{Confusion matrix - Random Forest, Frequency features}
-    \label{RFcm2}
-\end{table}
+being 0.9459 (see Table \ref{RFcm2}). The optimal value of \textit{mtry} is once again 11.
 
 \subsubsection*{Capital features}
 
 For the Capital features, the optimal value of \textit{mtry} turned out to be 1.
-We observe a significant decrease of the model performance in this case. The accuracy
+We observe a significant decrease of the model performance in this case. 
+From confusion matrix, shown in Table \ref{RFcm3}, we can see that the accuracy
 is 0.8243, the sensitivity is 0.8377 and the specificity is 0.8010. Those results 
 are better than for the KNN run on the same set of features, but for sure we would 
 not call them satisfying.
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 614 & 83 \\
-        spam & 119 & 334 \\
-    \end{tabular}
-    \caption{Confusion matrix - Random Forest, Capital features}
-    \label{RFcm3}
-\end{table}
 
 \subsubsection*{Features highly correlated with \textit{type}}
 
 As opposed to KNN, in case of Random Forest we don't observe a significant decrease
 of model performance after selecting the features highly correlated with \textit{type}.
-The accuracy here is 0.9287, the sensitivity is 0.9349, and the specificity is 0.9187.
+The accuracy here is 0.9287, the sensitivity is 0.9349, and the specificity is 0.9187 (see Table \ref{RFcm4}).
 Those results are slightly worse than for all features or Frequency features, but
 still quite good. The optimal value of \textit{mtry} is 3 this time.
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 661 & 36 \\
-        spam & 46 & 407 \\
-    \end{tabular}
-    \caption{Confusion matrix - Random Forest, Features highly correlated with type}
-    \label{RFcm4}
-\end{table}
 
 \subsubsection*{Features with highest average difference in frequency between types}
 
 For the last set of features, the 5-fold CV algorithm picked 4 as the optimal
-value of \textit{mtry}. The model performance is slightly worse than in case of
+value of \textit{mtry}. As we can sse from the confusion matrix shown in Table \ref{RFcm5},
+the model performance is slightly worse than in case of
 the previous set, but definitely better than for the Capital features,
 giving accuracy of 0.9139. What's worth noticing, the trend favoring the \textit{nonspam}
 class that we observed for all other cases, is reversed here. The sensitivity 
 is 0.9096, while the specificity equals 0.9214.
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        & \textbf{Reference} & \\
-        \textbf{Prediction} & nonspam & spam \\
-        nonspam & 664 & 33 \\
-        spam & 66 & 387 \\
-    \end{tabular}
-    \caption{Confusion matrix - Random Forest, Features with highest average difference in frequency between types}
-    \label{RFcm5}
-\end{table}
 
 \subsection*{Discriminant analysis}
 	
@@ -624,30 +510,6 @@ data transformed as earlier, so we compare scaled data and data transformed with
 At first let us use these methods on the whole data set and examine the accuracy. 
 To do it we use the confusion matrix, first for scaled data we have Table 
 \ref{tab:confusion_matrix_lda1} and Table \ref{tab:confusion_matrix_qda1}.
-	
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 661 & 36 \\
-			spam & 90 & 363 \\
-		\end{tabular}
-		\caption{Confusion Matrix - LDA, all features}
-		\label{tab:confusion_matrix_lda1}
-	\end{table}
-	
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 539 & 158 \\
-			spam & 18 & 435 \\
-		\end{tabular}
-		\caption{Confusion Matrix - QDA, all features}
-		\label{tab:confusion_matrix_qda1}
-	\end{table}
 
 The accuracy for described methods is quite satisfying, for LDA it's $0.8904$ 
 and for QDA - $0.847$. So in this case linear method works significantly better. 
@@ -658,30 +520,6 @@ and specificity, that for LDA are respectively $0.9098$, $0.8802$ and for QDA: $
 
 We perform the same algorithms on the data with logarithmic transformation and 
 obtain Tables \ref{tab:confusion_matrix_lda1_log} and \ref{tab:confusion_matrix_qda1_log}.
-	
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 675 & 22 \\
-			spam & 53 & 400 \\
-		\end{tabular}
-		\caption{Confusion Matrix - LDA, all features}
-		\label{tab:confusion_matrix_lda1_log}
-	\end{table}
-	
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 558 & 139 \\
-			spam & 25 & 428 \\
-		\end{tabular}
-		\caption{Confusion Matrix - QDA, all features}
-		\label{tab:confusion_matrix_qda1_log}
-	\end{table}
 	
 We see that this transformation helped our algorithm to obtain better accuracy: 
 $0.9348$ for LDA and $0.8574$ for QDA. From that we conclude that other feature 
@@ -695,30 +533,6 @@ We start with using either only variables representing frequencies and those des
 We again provide the confusion matrices that describes the classification methods: 
 Table \ref{tab:confusion_matrix_lda2} add Table \ref{tab:confusion_matrix_qda2}.
 	
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 670 & 27 \\
-			spam & 56 & 397 \\
-		\end{tabular}
-		\caption{Confusion Matrix - LDA, frequency features}
-		\label{tab:confusion_matrix_lda2}
-	\end{table}
-	
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 552 & 145 \\
-			spam & 24 & 429 \\
-		\end{tabular}
-		\caption{Confusion Matrix - QDA, frequency features}
-		\label{tab:confusion_matrix_qda2}
-	\end{table}
-	
 Above results exhibit accuracy $0.9278$ for LDA and $0.853$ for QDA. We also 
 observe similar disproportion in characteristics as for the previous case with 
 $0.9363$ sensitivity and $0.9229$ specificity for LDA and respectively $0.7474$ 
@@ -729,30 +543,6 @@ didn't have an enormous impact on discriminant analysis results.
 
 This time we take into account only three features containing information about capital 
 letters and get Tables \ref{tab:confusion_matrix_lda3} and \ref{tab:confusion_matrix_qda3}.
-
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 595 & 102 \\
-			spam & 208 & 245 \\
-		\end{tabular}
-		\caption{Confusion Matrix - LDA, capital features}
-		\label{tab:confusion_matrix_lda3}
-	\end{table}
-	
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 619 & 78 \\
-			spam & 247 & 206 \\
-		\end{tabular}
-		\caption{Confusion Matrix - QDA, capital features}
-		\label{tab:confusion_matrix_qda3}
-	\end{table}
 	 
 Here we obtain much worse accuracy: $0.7304$ for LDA and $0.7148$ - QDA. What's 
 interesting is that this time the disproportion between wrong classification of 
@@ -764,31 +554,6 @@ $0.7061$ and specificity $0.7410$ for LDA and $0.7254$, $0.7148$ respectively fo
 	 
 LDA and QDA results are presented in Table \ref{tab:confusion_matrix_lda4} 
 and Table \ref{tab:confusion_matrix_qda4}.
-	 
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 666 & 31 \\
-			spam & 91 & 362 \\
-		\end{tabular}
-		\caption{Confusion Matrix - LDA, features correlated with type}
-		\label{tab:confusion_matrix_lda4}
-	\end{table}
-	
-	\begin{table}[h]
-		\centering
-		\begin{tabular}{lcc}
-			& \textbf{Reference} & \\
-			\textbf{Prediction} & nonspam & spam \\
-			nonspam & 650 & 47 \\
-			spam & 91 & 362 \\
-		\end{tabular}
-		\caption{Confusion Matrix - QDA, features correlated with type}
-		\label{tab:confusion_matrix_qda4}
-	\end{table}
-	
 Despite having much less explanatory variables than when taking all frequency 
 features we obtain similar accuracy: $0.8939$ - LDA and $0.88$ - QDA. It's also 
 important to note that QDA accuracy is better in this case than for any other 
@@ -797,35 +562,11 @@ between two analyzed discriminant analysis methods. Such property results in sim
 statistics for both of them. Namely $0.9211$ sensitivity and $0.8798$ specificity 
 for LDA,  $0.8851$ and $0.8772$ respectively for QDA.
 	 
-	 \subsection*{features with highest average difference in frequency between types}
+\subsection*{Features with highest average difference in frequency between types}
 	 
 Last feature selection that we test is for variables exhibiting highest difference in 
 average frequency between types. Confusion matrices are shown in Table 
 \ref{tab:confusion_matrix_lda5} ad Table \ref{tab:confusion_matrix_qda5}.
-	 
-	 \begin{table}[h]
-	 	\centering
-	 	\begin{tabular}{lcc}
-	 		& \textbf{Reference} & \\
-	 		\textbf{Prediction} & nonspam & spam \\
-	 		nonspam & 644 & 53 \\
-	 		spam & 75 & 378 \\
-	 	\end{tabular}
-	 	\caption{Confusion Matrix - LDA, features with highest average difference in}
-	 	\label{tab:confusion_matrix_lda5}
-	 \end{table}
-	 
-	 \begin{table}[h]
-	 	\centering
-	 	\begin{tabular}{lcc}
-	 		& \textbf{Reference} & \\
-	 		\textbf{Prediction} & nonspam & spam \\
-	 		nonspam & 478 & 219 \\
-	 		spam & 19 & 434 \\
-	 	\end{tabular}
-	 	\caption{Confusion Matrix - QDA, features with highest average difference in}
-	 	\label{tab:confusion_matrix_qda5}
-	 \end{table}
 	 
 In this case accuracy of LDA is still comparable to other feature subsets, namely 
 $0.8887$, however for QDA we get $0.793$. It means that this feature subset didn't 
@@ -869,6 +610,261 @@ the cost-sensitive learning approach. Of course, the challenge here could be
 determining which e-mail type misclassification should be assigned with higher cost.
 Additionally, the cluster analysis could be used to separate the data, which
 will be done in the next part of the project.
+
+\section{Appendix}
+\label{sec:appendix}
+\subsection*{KNN}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 664 & 33 \\
+        spam & 37 & 416 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, all features}
+    \label{KNNcm1}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 665 & 32 \\
+        spam & 51 & 402 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, Frequency features}
+    \label{KNNcm2}
+\end{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 579 & 118 \\
+        spam & 111 & 342 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, Capital features}
+    \label{KNNcm3}
+\end{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 589 & 108 \\
+        spam & 116 & 337 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, Features highly correlated with type}
+    \label{KNNcm4}
+\end{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 638 & 59 \\
+        spam & 67 & 386 \\
+    \end{tabular}
+    \caption{Confusion matrix - KNN, Features with highest average difference in frequency between types}
+    \label{KNNcm5}
+\end{table}
+\subsection*{Random Forest}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 675 & 22 \\
+        spam & 34 & 419 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, all features}
+    \label{RFcm1}
+\end{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 673 & 24 \\
+        spam & 33 & 420 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, Frequency features}
+    \label{RFcm2}
+\end{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 614 & 83 \\
+        spam & 119 & 334 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, Capital features}
+    \label{RFcm3}
+\end{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 661 & 36 \\
+        spam & 46 & 407 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, Features highly correlated with type}
+    \label{RFcm4}
+\end{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        & \textbf{Reference} & \\
+        \textbf{Prediction} & nonspam & spam \\
+        nonspam & 664 & 33 \\
+        spam & 66 & 387 \\
+    \end{tabular}
+    \caption{Confusion matrix - Random Forest, Features with highest average difference in frequency between types}
+    \label{RFcm5}
+\end{table}
+\subsection*{Discriminant analysis}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 661 & 36 \\
+		spam & 90 & 363 \\
+	\end{tabular}
+	\caption{Confusion Matrix - LDA, all features}
+	\label{tab:confusion_matrix_lda1}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 539 & 158 \\
+		spam & 18 & 435 \\
+	\end{tabular}
+	\caption{Confusion Matrix - QDA, all features}
+	\label{tab:confusion_matrix_qda1}
+\end{table}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 675 & 22 \\
+		spam & 53 & 400 \\
+	\end{tabular}
+	\caption{Confusion Matrix - LDA, all features}
+	\label{tab:confusion_matrix_lda1_log}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 558 & 139 \\
+		spam & 25 & 428 \\
+	\end{tabular}
+	\caption{Confusion Matrix - QDA, all features}
+	\label{tab:confusion_matrix_qda1_log}
+\end{table}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 670 & 27 \\
+		spam & 56 & 397 \\
+	\end{tabular}
+	\caption{Confusion Matrix - LDA, frequency features}
+	\label{tab:confusion_matrix_lda2}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 552 & 145 \\
+		spam & 24 & 429 \\
+	\end{tabular}
+	\caption{Confusion Matrix - QDA, frequency features}
+	\label{tab:confusion_matrix_qda2}
+\end{table}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 595 & 102 \\
+		spam & 208 & 245 \\
+	\end{tabular}
+	\caption{Confusion Matrix - LDA, capital features}
+	\label{tab:confusion_matrix_lda3}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 619 & 78 \\
+		spam & 247 & 206 \\
+	\end{tabular}
+	\caption{Confusion Matrix - QDA, capital features}
+	\label{tab:confusion_matrix_qda3}
+\end{table}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 666 & 31 \\
+		spam & 91 & 362 \\
+	\end{tabular}
+	\caption{Confusion Matrix - LDA, features correlated with type}
+	\label{tab:confusion_matrix_lda4}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lcc}
+		& \textbf{Reference} & \\
+		\textbf{Prediction} & nonspam & spam \\
+		nonspam & 650 & 47 \\
+		spam & 91 & 362 \\
+	\end{tabular}
+	\caption{Confusion Matrix - QDA, features correlated with type}
+	\label{tab:confusion_matrix_qda4}
+\end{table}
+\begin{table}[h]
+ 	\centering
+ 	\begin{tabular}{lcc}
+ 		& \textbf{Reference} & \\
+ 		\textbf{Prediction} & nonspam & spam \\
+ 		nonspam & 644 & 53 \\
+ 		spam & 75 & 378 \\
+ 	\end{tabular}
+ 	\caption{Confusion Matrix - LDA, features with highest average difference in}
+ 	\label{tab:confusion_matrix_lda5}
+ \end{table}
+ 
+ \begin{table}[h]
+ 	\centering
+ 	\begin{tabular}{lcc}
+ 		& \textbf{Reference} & \\
+ 		\textbf{Prediction} & nonspam & spam \\
+ 		nonspam & 478 & 219 \\
+ 		spam & 19 & 434 \\
+ 	\end{tabular}
+ 	\caption{Confusion Matrix - QDA, features with highest average difference in}
+ 	\label{tab:confusion_matrix_qda5}
+\end{table}
 
 
 \end{document}

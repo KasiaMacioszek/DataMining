@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2020.4.5)  29 NOV 2023 20:17
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2020.4.5)  2 DEC 2023 19:35
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -315,52 +315,12 @@ Package pdftex.def Info: figure/avgErrKNN-1.pdf  used on input line 428.
  [12
 
  <./figure/avgErrKNN-1.pdf>]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
 <figure/avgErrRF-1.pdf, id=104, 505.89pt x 289.08pt>
 File: figure/avgErrRF-1.pdf Graphic file (type pdf)
 <use figure/avgErrRF-1.pdf>
-Package pdftex.def Info: figure/avgErrRF-1.pdf  used on input line 547.
+Package pdftex.def Info: figure/avgErrRF-1.pdf  used on input line 489.
 (pdftex.def)             Requested size: 469.75499pt x 268.43579pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[13]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[14 <./figure/avgErrRF-1.pdf>]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
+ [13 <./figure/avgErrRF-1.pdf>] [14]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
@@ -380,12 +340,57 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
 [16] [17] [18] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 2607 strings out of 492623
- 36782 string characters out of 6133291
- 137126 words of memory out of 5000000
- 6484 multiletter control sequences out of 15000+600000
+ 2608 strings out of 492623
+ 36796 string characters out of 6133291
+ 137135 words of memory out of 5000000
+ 6485 multiletter control sequences out of 15000+600000
  8768 words of font info for 31 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,9n,35p,273b,248s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -400,7 +405,7 @@ dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2019/texmf-dist/fonts
 lic/amsfonts/cm/cmsy10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfo
 nts/cm/cmti10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cm
 tt10.pfb>
-Output written on report.pdf (18 pages, 473600 bytes).
+Output written on report.pdf (18 pages, 473283 bytes).
 PDF statistics:
  167 PDF objects out of 1000 (max. 8388607)
  114 compressed objects within 2 object streams
