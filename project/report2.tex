@@ -77,6 +77,7 @@
 	This seems like a really good reduction in dimensionality, considering that we started off with as much as 55 features! 
 	
 	\section{Clustering}
+	\label{section::clustering}
 	For cluster analysis we will use k-means, PAM and AGNES algorithms for transformed \textit{Spambase} datasets and also for datasets built using principal components extracted while performing PCA. 
 	First thing we need to do before applying the algorithms is checking the optimal number of clusters $k$ for each of them.
 	In case of k-means and PAM, we will do it by calculating the silhouette index, and for AGNES we will select the number of clusters by analysing the dendrogram.
@@ -252,7 +253,170 @@
 	\end{table}
 	
 	\subsection{PAM}
+	For PAM method we again provide results for the same data transformations as for k-means. Figure \ref{fig::clust_pam_scaled} and Table \ref{tab::clust_pam_scaled} show results for standardized data. The situation, despite higher number of clusters is not significantly different that corresponding result for k-means algorithm. Clusters $2$ and $3$ contain almost only \textit{nonspam} observations, but in cluster number $1$ types are mixed. Let us now check the results obtained after applying PCA before PAM algorithm, that are shown on Figure \ref{fig::clust_pam_scaled_pca} and Table \ref{tab::clust_pam_scaled_pca}. This time again the cluster number 1 contains observations with mixed types and the other cluster holds almost only \textit{nonspam} observations.
 	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{proj2_plots/pam_res_scaled.png}
+		\caption{Clustering with PAM (z-score, no PCA)}
+		\label{fig::clust_pam_scaled}
+	\end{figure}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \multicolumn{2}{c}{\textbf{Type}} \\
+			\textbf{Cluster} & \textbf{nonspam} & \textbf{spam} \\
+			\textbf{1} & 2242 & 1810 \\
+			\textbf{2} & 421 & 3 \\
+			\textbf{2} & 125 & 0 \\
+		\end{tabular}
+		\caption{Clustering with PAM (z-score, no PCA)}
+		\label{tab::clust_pam_scaled}
+	\end{table}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{proj2_plots/pam_res_scaled_pca.png}
+		\caption{Clustering with PAM (z-score with PCA)}
+		\label{fig::clust_pam_scaled_pca}
+	\end{figure}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \multicolumn{2}{c}{\textbf{Type}} \\
+			\textbf{Cluster} & \textbf{nonspam} & \textbf{spam} \\
+			\textbf{1} & 2120 & 1798 \\
+			\textbf{2} & 668 & 15 \\
+		\end{tabular}
+		\caption{Clustering with PAM (z-score with PCA)}
+		\label{tab::clust_pam_scaled_pca}
+	\end{table}
+	
+	Next, we will use data after log-transformation, first results obtained from data with original dimensionality are presented on Figure \ref{fig::clust_pam_log} and Table \ref{tab::clust_pam_log}. Once again results resemble the ones obtained with k-means algorithm. In one of the clusters majority of observations are of \textit{nonspam} type, while the opposite is for second cluster. Results of PAM clustering after PCA are presented on Figure \ref{fig::clust_pam_log_pca} and Table \ref{tab::clust_pam_log_pca}. Here we can observe notable difference. Here the observations of different types seem to be quite well separated between two created clusters. That is the case in which we observe the best partition when comparing to external indices. It also confirms that data transformations done before clustering have high impact on the result.
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{proj2_plots/pam_res_log.png}
+		\caption{Clustering with PAM (log, no PCA)}
+		\label{fig::clust_pam_log}
+	\end{figure}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \multicolumn{2}{c}{\textbf{Type}} \\
+			\textbf{Cluster} & \textbf{nonspam} & \textbf{spam} \\
+			\textbf{1} & 796 & 1558 \\
+			\textbf{2} & 1376 & 250 \\
+			\textbf{3} & 616 & 5 \\
+		\end{tabular}
+		\caption{Clustering with PAM (log, no PCA)}
+		\label{tab::clust_pam_log}
+	\end{table}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{proj2_plots/pam_res_log_pca.png}
+		\caption{Clustering with PAM (log with PCA)}
+		\label{fig::clust_pam_log_pca}
+	\end{figure}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \multicolumn{2}{c}{\textbf{Type}} \\
+			\textbf{Cluster} & \textbf{nonspam} & \textbf{spam} \\
+			\textbf{1} & 203 & 1438 \\
+			\textbf{2} & 2585 & 375 \\
+		\end{tabular}
+		\caption{Clustering with PAM (log with PCA)}
+		\label{tab::clust_pam_log_pca}
+	\end{table}
+		
 	\subsection{AGNES}
+	The other type of clustering algorithm is the hierarchical clustering. We will take into consideration the agglomerative algorithm AGNES. The dendrograms were presented already in Section \ref{section::clustering} as they were required to select the number of clusters that we want to split data to. To check how this clustering algorithm worked in case of \textit{spam} and \textit{nonspam} messages partition, we again provide similar plots. First for standardized data: Figure \ref{fig::clust_agnes_scaled} and Table \ref{tab::clust_agnes_scaled} show that all outliers placed in cluster $3$ are \textit{nonspam}. Other two clusters seem to separate two types of messages quite well, especially compared to previous results for this particular data. Let us now look, how AGNES algorithm will partition data after PCA, which is presented on Figure \ref{fig::clust_agnes_scaled_pca} and Table \ref{tab::clust_agnes_scaled_pca}. Here the results are almost identical as without PCA, again one cluster contains \textit{nonspam} outliers and the other two separate message types quite well.
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{proj2_plots/agnes_res_scaled.png}
+		\caption{Clustering with AGNES (z-score, no PCA)}
+		\label{fig::clust_agnes_scaled}
+	\end{figure}
 	 
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \multicolumn{2}{c}{\textbf{Type}} \\
+			\textbf{Cluster} & \textbf{nonspam} & \textbf{spam} \\
+			\textbf{1} & 568 & 1445 \\
+			\textbf{2} & 2175 & 368 \\
+			\textbf{3} & 45 & 0 \\
+		\end{tabular}
+		\caption{Clustering with AGNES (z-score, no PCA)}
+		\label{tab::clust_agnes_scaled}
+	\end{table}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{proj2_plots/agnes_res_scaled_pca.png}
+		\caption{Clustering with AGNES (z-score with PCA)}
+		\label{fig::clust_agnes_scaled_pca}
+	\end{figure}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \multicolumn{2}{c}{\textbf{Type}} \\
+			\textbf{Cluster} & \textbf{nonspam} & \textbf{spam} \\
+			\textbf{1} & 2450 & 685 \\
+			\textbf{2} & 302 & 1128 \\
+			\textbf{3} & 36 & 0 \\
+		\end{tabular}
+		\caption{Clustering with AGNES (z-score with PCA)}
+		\label{tab::clust_agnes_scaled_pca}
+	\end{table}
+	
+	We once more compare previous results to those based on log-transformed data for which results are introduced on Figure \ref{fig::clust_agnes_log} and Table \ref{tab::clust_agnes_log}. This time, none of three created clusters contains outliers, however once again we notice that AGNES algorithm separated \textit{spam} and \textit{nonspam} messages noticeably well. Let us now check if this holds also for data after PCA, for which outputs are shown on Figure \ref{fig::clust_agnes_log_pca} and Table \ref{tab::clust_agnes_log_pca}. There we can see that obtained results are analogous to the ones without PCA.
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{proj2_plots/agnes_res_log.png}
+		\caption{Clustering with AGNES (log, no PCA)}
+		\label{fig::clust_agnes_log}
+	\end{figure}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \multicolumn{2}{c}{\textbf{Type}} \\
+			\textbf{Cluster} & \textbf{nonspam} & \textbf{spam} \\
+			\textbf{1} & 117 & 1322 \\
+			\textbf{2} & 1672 & 395 \\
+			\textbf{3} & 999 & 96 \\
+		\end{tabular}
+		\caption{Clustering with AGNES (log, no PCA)}
+		\label{tab::clust_agnes_log}
+	\end{table}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.9\textwidth]{proj2_plots/agnes_res_log_pca.png}
+		\caption{Clustering with AGNES (log with PCA)}
+		\label{fig::clust_agnes_log_pca}
+	\end{figure}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{lcc}
+			& \multicolumn{2}{c}{\textbf{Type}} \\
+			\textbf{Cluster} & \textbf{nonspam} & \textbf{spam} \\
+			\textbf{1} & 196 & 1436 \\
+			\textbf{2} & 1765 & 367 \\
+			\textbf{3} & 827 & 10 \\
+		\end{tabular}
+		\caption{Clustering with AGNES (log with PCA)}
+		\label{tab::clust_agnes_log_pca}
+	\end{table}
 \end{document}
